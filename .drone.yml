@@ -1,0 +1,57 @@
+---
+
+kind: pipeline
+name: default
+type: kubernetes
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build_docker_image
+  pull: if-not-exists
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+  commands:
+  - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+  - docker build -t ileap-java17-mvn:$${DRONE_COMMIT_SHA} .
+  when:
+    event:
+    - push
+    - tag
+
+- name: image_to_quay
+  pull: if-not-exists
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+  commands:
+  - docker login -u="ukhomeofficedigital+ileapquay" -p=$${DOCKER_PASSWORD} quay.io
+  - docker tag ileap-java17-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/ileap-java17-mvn:$${DRONE_COMMIT_SHA}
+  - docker tag ileap-java17-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/ileap-java17-mvn:latest
+  - docker push quay.io/ukhomeofficedigital/ileap-java17-mvn:$${DRONE_COMMIT_SHA}
+  - docker push quay.io/ukhomeofficedigital/ileap-java17-mvn:latest
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+  when:
+    branch:
+    - main
+    event:
+    - push
+
+- name: tagged_image_to_quay
+  pull: if-not-exists
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+  commands:
+  - docker login -u="ukhomeofficedigital+ileapquay" -p=$${DOCKER_PASSWORD} quay.io
+  - docker tag ileap-java17-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/ileap-java17-mvn:$${DRONE_TAG}
+  - docker push quay.io/ukhomeofficedigital/ileap-java17-mvn:$${DRONE_TAG}
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+  when:
+    event:
+    - tag
+
+services:
+- name: docker
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind:latest
