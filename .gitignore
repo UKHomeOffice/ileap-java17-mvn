@@ -1,0 +1,22 @@
+# Operating System Files
+
+*.DS_Store
+Thumbs.db
+*~
+.#*
+#*
+*#
+
+# IDE Project Files #
+
+**/*.iml
+**/*.idea
+**/.settings/
+**/target/
+**/bin/
+**/*.m2
+**/*.project
+/build/
+**/*.classpath
+**/*.scannerwork
+
