@@ -6,6 +6,7 @@ RUN apk --no-cache add curl
 WORKDIR /scripts
 COPY ./scripts /scripts
 
+
 ARG ART_USERNAME
 ARG ART_PASSWORD
 
