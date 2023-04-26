@@ -15,7 +15,6 @@ ENV ARTIFACTORY_USERNAME=${ART_USERNAME} \
 
 ENV MVN_VERSION 3.8.4
 
-
 # Install Maven
 RUN apk add git
 RUN mkdir -p $HOME/.m2/ && \
