@@ -1,5 +1,5 @@
 ### BUILD image
-FROM quay.io/ukhomeofficedigital/ileap-java17:1.1 as builder
+FROM quay.io/ukhomeofficedigital/ileap-java17:1.2 as builder
 
 RUN apk --no-cache add curl
 
